@@ -1,0 +1,11 @@
+version:  '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=narrationbox
+      - POSTGRES_PASSWORD=nb123
+      - POSTGRES_DB=nb_task_manager
