@@ -5,6 +5,7 @@ from app.schemas.todo import TodoCreate
 from .base import BaseService
 from sqlalchemy import update
 from ..sse.event_queue import emit_event
+from datetime import datetime
 
 
 class TodoService(BaseService):
@@ -14,7 +15,20 @@ class TodoService(BaseService):
         self.db.add(new_todo)
         await self.db.commit()
         await self.db.refresh(new_todo)
-        await emit_event(new_todo)
+        total_tasks = await self.get_all()
+        if len(total_tasks) == 1:
+            emit_event({"type": "Achievement", "content": "First task added"})
+        elif len(total_tasks) == 5:
+            emit_event({"type": "Achievement", "content": "5 tasks added!"})
+
+        today = datetime.today().date()  # Get today's date (without time)
+        today_tasks = [
+            task for task in total_tasks if task.created_at.date() == today]
+
+        if len(today_tasks) == 3:
+            emit_event(
+                {"type": "Achievement", "content": f"Added 3 tasks in a single day!"})
+
         return new_todo
 
     async def get_all(self) -> list[Todo]:
@@ -32,7 +46,6 @@ class TodoService(BaseService):
         todo = await self.get_by_id(todo_id)
         if not todo:
             raise NoResultFound(f"Todo with id: {id} not found!")
-        return todo
         await self.db.delete(todo)
         await self.db.commit()
         await emit_event({"type": "Achievement", "content": "Big Achievement."})
@@ -50,6 +63,14 @@ class TodoService(BaseService):
             result = await self.db.execute(stmt)
             await self.db.commit()
             todo = result.scalar_one()
+            result = await self.db.execute(select(Todo).where(Todo.completed is True))
+            total_complete = result.scalars().all()
+            if len(total_complete) == 1:
+                emit_event(
+                    {"type": "Achievement", "content": "Crushed your first task"})
+            elif len(total_complete) == 3:
+                emit_event(
+                    {"type": "Achievement", "content": "Crushed 3 tasks!"})
             return todo
         except Exception as e:
             await self.db.rollback()

@@ -69,7 +69,7 @@ async def mark_as_complete(
         raise NoResultFound(f"Todo with id {todo_id} not found!")
 
 
-@ router.post("/generate")
+@router.post("/generate")
 async def generate_todos(
     request: TaskRequest,
     service: TodoService = Depends(get_service(TodoService))

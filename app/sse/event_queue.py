@@ -14,7 +14,7 @@ async def handle_sse():
     event = await event_queue.get()
     if isinstance(event, Todo):
         return {"data": TodoResponse.from_orm(event).model_dump_json()}
-    elif isinstance(event, dict) and "type" in event:
+    elif isinstance(event, dict) and "type" in event and "content" in event:
         return {"data": json.dumps(event)}
     else:
         return {"data": json.dumps(event)}
