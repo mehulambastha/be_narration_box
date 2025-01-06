@@ -39,8 +39,9 @@ async def get_todo(
         todo = await service.get_by_id(todo_id)
         return TodoResponse.from_orm(todo)
     except NoResultFound:
-        raise HTTPException(status_code=404, detail=f"Todo with it {
-                            todo_id} not found!")
+        raise HTTPException(status_code=404, detail=(
+            f"Todo with it {todo_id} not found!"
+        ))
 
 
 @router.delete("/delete/{todo_id}")
@@ -51,8 +52,9 @@ async def delete_todo(
     try:
         return await service.delete(todo_id)
     except NoResultFound:
-        raise HTTPException(status_code=404, detail=f"Todo with id {
-                            todo_id} does not eist!")
+        raise HTTPException(status_code=404, detail=(
+            f"Todo with id {todo_id} does not eist!"
+        ))
 
 
 @router.put("/complete/{todo_id}")
@@ -67,7 +69,7 @@ async def mark_as_complete(
         raise NoResultFound(f"Todo with id {todo_id} not found!")
 
 
-@router.post("/generate")
+@ router.post("/generate")
 async def generate_todos(
     request: TaskRequest,
     service: TodoService = Depends(get_service(TodoService))

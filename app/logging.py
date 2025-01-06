@@ -14,7 +14,7 @@ formatter = logging.Formatter(
 console_handler.setFormatter(formatter)
 
 file_handler = RotatingFileHandler(
-    'app.log', maxBytes=10**6, backupCount=3
+    '/app/logs/app.log', maxBytes=10**6, backupCount=3
 )
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
